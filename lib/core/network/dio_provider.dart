@@ -1,0 +1,62 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
+
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:dio/browser.dart' show BrowserHttpClientAdapter;
+import 'package:universal_html/html.dart' as html;
+import '../services/token_storage_service.dart';
+
+/// Global [Dio] instance configured for the API.
+final dioProvider = Provider<Dio>((ref) {
+  final dio = Dio(
+    BaseOptions(
+      // Backend base URL – no /api suffix needed since routes include it
+      baseUrl: kIsWeb
+          ? 'http://localhost/mediconnect/public' // For web browsers
+          : kIsWeb
+              ? 'http://localhost/mediconnect/public' // For mobile apps
+              : 'http://localhost/mediconnect/public',
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
+    ),
+  );
+
+  // On web, ensure cookies (session & XSRF) are included with every request
+  if (kIsWeb) {
+    (dio.httpClientAdapter as BrowserHttpClientAdapter).withCredentials = true;
+
+    // Attach XSRF token from cookie for Sanctum-protected POST/PUT/DELETE requests
+    final cookies = html.document.cookie?.split('; ') ?? [];
+    final xsrfPair = cookies.firstWhere(
+      (c) => c.startsWith('XSRF-TOKEN='),
+      orElse: () => '',
+    );
+    void setXsrfHeader() {
+      final cookies = html.document.cookie?.split('; ') ?? [];
+      final xsrf = cookies.firstWhere(
+        (c) => c.startsWith('XSRF-TOKEN='),
+        orElse: () => '',
+      );
+      if (xsrf.isNotEmpty) {
+        final token = Uri.decodeComponent(xsrf.substring('XSRF-TOKEN='.length));
+        dio.options.headers['X-XSRF-TOKEN'] = token;
+      }
+    }
+
+    // initial set
+    setXsrfHeader();
+
+    // refresh header before every request
+    dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+      setXsrfHeader();
+      return handler.next(options);
+    }));
+  }
+  return dio;
+});
