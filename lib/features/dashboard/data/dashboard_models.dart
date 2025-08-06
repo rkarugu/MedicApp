@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'shift_application_models.dart';
+
 class Shift {
   final int id;
   final String title;
@@ -68,7 +71,7 @@ class InstantRequest {
 }
 
 class BidInvitation {
-  final int invitationId;
+  final String invitationId; // Changed to String to match notification UUID
   final String facility;
   final String shiftTime;
   final int minimumBid;
@@ -85,7 +88,7 @@ class BidInvitation {
   });
 
   factory BidInvitation.fromJson(Map<String, dynamic> json) => BidInvitation(
-    invitationId: json['invitationId'] ?? 0,
+    invitationId: json['notificationId'] ?? json['invitationId'] ?? '', // Use notificationId from backend
     facility: json['facility'] ?? '',
     shiftTime: json['shiftTime'] ?? '',
     minimumBid: json['minimumBid'] ?? 0,
@@ -98,12 +101,14 @@ class DashboardData {
   final List<Shift> upcomingShifts;
   final List<InstantRequest> instantRequests;
   final List<BidInvitation> bidInvitations;
+  final List<ShiftApplication> shiftApplications;
   final List<Shift> shiftHistory;
 
   DashboardData({
     required this.upcomingShifts,
     required this.instantRequests,
     required this.bidInvitations,
+    required this.shiftApplications,
     required this.shiftHistory,
   });
 
@@ -111,6 +116,7 @@ class DashboardData {
     upcomingShifts: (json['upcoming_shifts'] as List<dynamic>?)?.map((e) => Shift.fromJson(e)).toList() ?? [],
     instantRequests: (json['instant_requests'] as List<dynamic>?)?.map((e) => InstantRequest.fromJson(e)).toList() ?? [],
     bidInvitations: (json['bidInvitations'] as List<dynamic>?)?.map((e) => BidInvitation.fromJson(e)).toList() ?? [],
+    shiftApplications: (json['shift_applications'] as List<dynamic>?)?.map((e) => ShiftApplication.fromJson(e)).toList() ?? [],
     shiftHistory: (json['shift_history'] as List<dynamic>?)?.map((e) => Shift.fromJson(e)).toList() ?? [],
   );
 }

@@ -11,12 +11,12 @@ import '../services/token_storage_service.dart';
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
     BaseOptions(
-      // Backend base URL – no /api suffix needed since routes include it
+      // Backend base URL – includes /api prefix
       baseUrl: kIsWeb
-          ? 'http://localhost/mediconnect/public' // For web browsers
-          : kIsWeb
-              ? 'http://localhost/mediconnect/public' // For mobile apps
-              : 'http://localhost/mediconnect/public',
+          ? 'http://localhost:8000/api' // For web browsers (Laravel dev server)
+          : Platform.isAndroid
+              ? 'http://10.0.2.2:8000/api' // For Android emulators
+              : 'http://localhost:8000/api', // For iOS simulators
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       headers: {

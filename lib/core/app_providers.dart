@@ -28,10 +28,10 @@ final baseDioProvider = Provider<Dio>((ref) {
   final dio = Dio(
     BaseOptions(
       baseUrl: kIsWeb
-          ? 'http://localhost/mediconnect/public/api'
+          ? 'http://localhost:8000/api'
           : Platform.isAndroid
-              ? 'http://localhost/mediconnect/public/api' // For Android emulators
-              : 'http://localhost/mediconnect/public/api',
+              ? 'http://10.0.2.2:8000/api' // For Android emulators
+              : 'http://localhost:8000/api',
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       headers: {

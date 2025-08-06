@@ -9,54 +9,97 @@ class BidInvitationsListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Enable auto-refresh for real-time notifications
+    ref.watch(dashboardAutoRefreshProvider);
+    
     final dashboardAsync = ref.watch(dashboardProvider);
     
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bid Invitations'),
         backgroundColor: Colors.purple,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              // Force refresh the dashboard data
+              ref.invalidate(dashboardProvider);
+            },
+            tooltip: 'Refresh',
+          ),
+        ],
       ),
-      body: dashboardAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: ${err.toString()}')),
-        data: (data) {
-          if (data.bidInvitations.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Force refresh the dashboard data
+          ref.invalidate(dashboardProvider);
+          // Wait for the new data to load
+          await ref.read(dashboardProvider.future);
+        },
+        child: dashboardAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Error: ${err.toString()}'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => ref.invalidate(dashboardProvider),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+          data: (data) {
+            if (data.bidInvitations.isEmpty) {
+              return ListView(
                 children: [
-                  Icon(Icons.gavel, size: 64, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text(
-                    'No bid invitations available',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                  const SizedBox(height: 100),
+                  const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.gavel, size: 64, color: Colors.grey),
+                        SizedBox(height: 16),
+                        Text(
+                          'No bid invitations available',
+                          style: TextStyle(fontSize: 18, color: Colors.grey),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          'Pull down to refresh',
+                          style: TextStyle(fontSize: 14, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-            );
-          }
-
-          return ListView.builder(
-            padding: const EdgeInsets.all(16.0),
-            itemCount: data.bidInvitations.length,
-            itemBuilder: (context, index) {
-              final invitation = data.bidInvitations[index];
-              return BidInvitationCard(
-                invitation: invitation,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => BidInvitationDetailScreen(
-                        bidInvitation: invitation,
-                      ),
-                    ),
-                  );
-                },
               );
-            },
-          );
-        },
+            }
+
+            return ListView.builder(
+              padding: const EdgeInsets.all(16.0),
+              itemCount: data.bidInvitations.length,
+              itemBuilder: (context, index) {
+              final invitation = data.bidInvitations[index];
+                return BidInvitationCard(
+                  invitation: invitation,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BidInvitationDetailScreen(
+                          bidInvitation: invitation,
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            );
+          },
+        ),
       ),
     );
   }

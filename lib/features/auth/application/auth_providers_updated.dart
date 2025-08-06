@@ -55,7 +55,7 @@ class UpdatedAuthApiService {
 
   Future<Map<String, dynamic>> getUserProfile() async {
     try {
-      final response = await _dio.get('/worker/me');
+      final response = await _dio.get('/api/worker/me');
       return response.data;
     } catch (e) {
       throw Exception('Profile fetch failed: ${e.toString()}');
@@ -64,7 +64,7 @@ class UpdatedAuthApiService {
 
   Future<void> logout() async {
     try {
-      await _dio.post('/worker/logout');
+      await _dio.post('/api/worker/logout');
     } catch (e) {
       // Log error but continue
       print('Logout error: $e');
@@ -73,7 +73,7 @@ class UpdatedAuthApiService {
 
   Future<Map<String, dynamic>> updateProfile(Map<String, dynamic> data) async {
     try {
-      final response = await _dio.put('/worker/profile', data: data);
+      final response = await _dio.put('/api/worker/profile', data: data);
       return response.data;
     } catch (e) {
       throw Exception('Profile update failed: ${e.toString()}');

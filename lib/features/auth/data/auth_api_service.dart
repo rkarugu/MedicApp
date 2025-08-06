@@ -14,7 +14,7 @@ class AuthApiService {
   }) async {
     try {
       final response = await _dio.post(
-        '/api/medical-worker/login',
+        '/medical-worker/login',
         data: {
           'email': email,
           'password': password,
@@ -40,7 +40,7 @@ class AuthApiService {
   }) async {
     try {
       final response = await _dio.post(
-        '/api/medical-worker/register',
+        '/medical-worker/register',
         data: {
           'name': name,
           'email': email,
@@ -66,7 +66,7 @@ class AuthApiService {
       if (token == null) throw Exception('No token found');
 
       final response = await _dio.get(
-        '/api/worker/me',
+        '/worker/me',
         options: Options(
           headers: {'Authorization': 'Bearer $token'},
         ),
@@ -84,7 +84,7 @@ class AuthApiService {
       final token = await _tokenStorage.getToken();
       if (token != null) {
         await _dio.post(
-          '/api/worker/logout',
+          '/worker/logout',
           options: Options(
             headers: {'Authorization': 'Bearer $token'},
           ),
@@ -104,7 +104,7 @@ class AuthApiService {
       if (token == null) throw Exception('No token found');
 
       final response = await _dio.put(
-        '/api/worker/profile',
+        '/worker/profile',
         data: data,
         options: Options(
           headers: {'Authorization': 'Bearer $token'},

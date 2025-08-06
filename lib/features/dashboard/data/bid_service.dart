@@ -6,16 +6,33 @@ class BidService {
   BidService(this._dio);
 
   Future<Map<String, dynamic>> applyToBidInvitation({
-    required int bidInvitationId,
+    required String bidInvitationId,
     required double bidAmount,
   }) async {
     try {
+      print('Sending bid acceptance request:');
+      print('  URL: /worker/shifts/bid-invitations/$bidInvitationId/apply');
+      print('  Method: POST');
+      print('  Data: {"bid_amount": $bidAmount}');
+      
       final response = await _dio.post(
-        '/api/worker/shifts/bid-invitations/$bidInvitationId/apply',
+        '/worker/shifts/bid-invitations/$bidInvitationId/apply',
         data: {
           'bid_amount': bidAmount,
         },
+        options: Options(
+          method: 'POST', // Explicitly set method
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        ),
       );
+      
+      print('Bid acceptance response:');
+      print('  Status: ${response.statusCode}');
+      print('  Data: ${response.data}');
       
       return {
         'success': true,
@@ -40,7 +57,7 @@ class BidService {
 
   Future<List<Map<String, dynamic>>> getBidInvitations() async {
     try {
-      final response = await _dio.get('/api/worker/shifts/bid-invitations');
+      final response = await _dio.get('/worker/shifts/bid-invitations');
       
       if (response.data['success'] == true) {
         return List<Map<String, dynamic>>.from(response.data['data'] ?? []);

@@ -1,20 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/dashboard_models.dart';
+import '../../application/dashboard_provider.dart';
+import '../../data/shift_application_models.dart';
+import '../utils/bid_utils.dart';
 import '../dashboard_page.dart';
 import '../bid_invitations_list_screen.dart';
-import 'upcoming_shift_card.dart';
 import 'bid_invitation_notification_card.dart';
+import 'shift_application_card.dart';
+import 'upcoming_shift_card.dart';
 
-class DashboardCards extends StatelessWidget {
+class DashboardCards extends ConsumerWidget {
   final DashboardData data;
   const DashboardCards({super.key, required this.data});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final List<_DashboardItem> dashboardItems = [
       _DashboardItem(title: 'Upcoming Shifts', count: data.upcomingShifts.length, icon: Icons.access_time, color: Colors.blue),
       _DashboardItem(title: 'Instant Requests', count: data.instantRequests.length, icon: Icons.flash_on, color: Colors.orange),
       _DashboardItem(title: 'Bid Invitations', count: data.bidInvitations.length, icon: Icons.gavel, color: Colors.purple),
+      _DashboardItem(title: 'Shift Applications', count: data.shiftApplications.length, icon: Icons.assignment, color: Colors.green),
     ];
 
     return Column(
@@ -45,7 +51,7 @@ class DashboardCards extends StatelessWidget {
               if (context.mounted) {
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => DashboardPage(),
+                    builder: (context) => const DashboardPage(),
                   ),
                 );
               }
@@ -59,7 +65,18 @@ class DashboardCards extends StatelessWidget {
             invitation: invitation,
             onAccept: () {
               // Handle bid acceptance
-              handleBidAcceptance(context, invitation);
+              handleBidAcceptance(context, ref, invitation);
+            },
+          )),
+          const SizedBox(height: 16),
+        ],
+        if (data.shiftApplications.isNotEmpty) ...[  
+          const _SectionHeader(title: 'Shift Applications'),
+          ...data.shiftApplications.take(5).map((application) => ShiftApplicationCard(
+            application: application,
+            onStatusChanged: () {
+              // Trigger dashboard refresh when shift status changes
+              ref.read(dashboardRefreshProvider)();
             },
           )),
           const SizedBox(height: 16),
@@ -99,7 +116,7 @@ class _DashboardGridCard extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => BidInvitationsListScreen(),
+                builder: (context) => const BidInvitationsListScreen(),
               ),
             );
           }
@@ -168,3 +185,5 @@ class _ShiftHistoryCard extends StatelessWidget {
     );
   }
 }
+
+

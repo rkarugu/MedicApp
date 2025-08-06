@@ -10,12 +10,12 @@ class NotificationDashboardService {
 
   Future<List<BidInvitation>> getBidInvitationsFromNotifications() async {
     try {
-      final response = await _dio.get('/worker/shifts/bid-invitations');
+      final response = await _dio.get('/api/worker/shifts/bid-invitations');
       
       if (response.data['success'] == true) {
         final List<dynamic> data = response.data['data'] ?? [];
         return data.map((item) => BidInvitation(
-          invitationId: item['invitationId'] ?? 0,
+          invitationId: item['notificationId'] ?? item['invitationId'] ?? '',
           facility: item['facility'] ?? 'Medical Facility',
           shiftTime: item['shiftTime'] ?? 'TBD',
           minimumBid: item['minimumBid'] ?? 0,
@@ -41,9 +41,9 @@ class NotificationDashboardService {
     }
   }
 
-  Future<void> markBidInvitationAsRead(int invitationId) async {
+  Future<void> markBidInvitationAsRead(String invitationId) async {
     try {
-      await _dio.patch('/api/worker/notifications/$invitationId/read');
+      await _dio.patch('/worker/notifications/$invitationId/read');
     } catch (e) {
       print('Error marking bid invitation as read: $e');
     }

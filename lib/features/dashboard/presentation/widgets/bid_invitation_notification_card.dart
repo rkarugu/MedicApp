@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/dashboard_models.dart';
+import '../utils/bid_utils.dart';
 
 // Bid Invitation Notification Card
-class BidInvitationNotificationCard extends StatelessWidget {
+class BidInvitationNotificationCard extends ConsumerWidget {
   final BidInvitation invitation;
   final VoidCallback onAccept;
 
@@ -13,7 +15,7 @@ class BidInvitationNotificationCard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       elevation: 1,
       margin: const EdgeInsets.only(bottom: 8),
@@ -63,42 +65,4 @@ class BidInvitationNotificationCard extends StatelessWidget {
       return dateTimeStr;
     }
   }
-}
-
-// Handle bid acceptance
-void handleBidAcceptance(BuildContext context, BidInvitation invitation) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Accept Bid Invitation'),
-        content: Text(
-          'Do you want to apply for this shift: ${invitation.title} at ${invitation.facility}?\n\nMinimum Bid: KES ${invitation.minimumBid}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              // TODO: Call API to accept bid invitation
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Application submitted for ${invitation.title}'),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.purple,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Accept'),
-          ),
-        ],
-      );
-    },
-  );
 }

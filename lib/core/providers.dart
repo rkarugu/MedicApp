@@ -28,12 +28,12 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
   
   final dio = Dio(
     BaseOptions(
-      // TODO: replace with your backend base URL – keep `/api` suffix for retrofit paths.
+      // Laravel development server base URL with /api suffix
       baseUrl: kIsWeb
-          ? 'http://localhost/mediconnect/public/api' // For web browsers
+          ? 'http://localhost:8000/api' // For web browsers (Laravel dev server)
           : Platform.isAndroid
-              ? 'http://localhost/mediconnect/public/api' // For Android emulators
-              : 'http://localhost/mediconnect/public/api',
+              ? 'http://10.0.2.2:8000/api' // For Android emulators
+              : 'http://localhost:8000/api', // For iOS simulators
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       headers: {
@@ -41,8 +41,38 @@ final authenticatedDioProvider = Provider<Dio>((ref) {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
       },
+      followRedirects: false, // Prevent redirects that might change the method
+      validateStatus: (status) => status! < 500, // Don't throw on 4xx errors
     ),
   );
+  
+  // Add request/response logging interceptor
+  dio.interceptors.add(InterceptorsWrapper(
+    onRequest: (options, handler) async {
+      print('[Dio] Request:');
+      print('[Dio] ${options.method.toUpperCase()} ${options.uri}');
+      print('[Dio] Headers: ${options.headers}');
+      if (options.data != null) {
+        print('[Dio] Body: ${options.data}');
+      }
+      return handler.next(options);
+    },
+    onResponse: (response, handler) {
+      print('[Dio] Response:');
+      print('[Dio] Status: ${response.statusCode}');
+      print('[Dio] Headers: ${response.headers}');
+      print('[Dio] Data: ${response.data}');
+      return handler.next(response);
+    },
+    onError: (DioException e, handler) {
+      print('[Dio] Error:');
+      print('[Dio] ${e.requestOptions.method.toUpperCase()} ${e.requestOptions.uri}');
+      print('[Dio] Status: ${e.response?.statusCode}');
+      print('[Dio] Error: ${e.message}');
+      print('[Dio] Response: ${e.response?.data}');
+      return handler.next(e);
+    },
+  ));
 
   // On web, ensure cookies (session & XSRF) are included with every request
   if (kIsWeb) {

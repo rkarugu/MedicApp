@@ -7,7 +7,7 @@ class MediconnectApi {
   final Dio _dio;
   final String baseUrl;
 
-  MediconnectApi(this._dio, {this.baseUrl = 'http://localhost/mediconnect/public'}) {
+  MediconnectApi(this._dio, {this.baseUrl = 'http://localhost:8000'}) {
     _dio.options.baseUrl = baseUrl;
   }
 
@@ -28,11 +28,11 @@ class MediconnectApi {
   }
 
   Future<void> markNotificationAsRead(String notificationId) async {
-    await _dio.patch('/api/worker/notifications/$notificationId/read');
+    await _dio.patch('/worker/notifications/$notificationId/read');
   }
 
   Future<void> markAllNotificationsAsRead() async {
-    await _dio.patch('/api/worker/notifications/mark-all-read');
+    await _dio.patch('/worker/notifications/mark-all-read');
   }
 
   Future<void> deleteNotification(String notificationId) async {

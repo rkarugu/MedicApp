@@ -28,7 +28,7 @@ class MockDashboardData {
 
   static const bidInvitations = [
     {
-      'invitationId': 501,
+      'invitationId': '501',
       'facility': 'Hope Hospital',
       'shiftTime': '2025-06-22 09:00',
       'minimumBid': 2500,
