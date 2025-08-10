@@ -16,11 +16,14 @@ class DashboardCards extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Filter out completed shift applications for dashboard display
+    final activeShiftApplications = data.shiftApplications.where((app) => app.status != 'completed').toList();
+    
     final List<_DashboardItem> dashboardItems = [
       _DashboardItem(title: 'Upcoming Shifts', count: data.upcomingShifts.length, icon: Icons.access_time, color: Colors.blue),
       _DashboardItem(title: 'Instant Requests', count: data.instantRequests.length, icon: Icons.flash_on, color: Colors.orange),
       _DashboardItem(title: 'Bid Invitations', count: data.bidInvitations.length, icon: Icons.gavel, color: Colors.purple),
-      _DashboardItem(title: 'Shift Applications', count: data.shiftApplications.length, icon: Icons.assignment, color: Colors.green),
+      _DashboardItem(title: 'Shift Applications', count: activeShiftApplications.length, icon: Icons.assignment, color: Colors.green),
     ];
 
     return Column(
@@ -70,9 +73,9 @@ class DashboardCards extends ConsumerWidget {
           )),
           const SizedBox(height: 16),
         ],
-        if (data.shiftApplications.isNotEmpty) ...[  
+        if (activeShiftApplications.isNotEmpty) ...[  
           const _SectionHeader(title: 'Shift Applications'),
-          ...data.shiftApplications.take(5).map((application) => ShiftApplicationCard(
+          ...activeShiftApplications.take(5).map((application) => ShiftApplicationCard(
             application: application,
             onStatusChanged: () {
               // Trigger dashboard refresh when shift status changes

@@ -313,10 +313,14 @@ class ShiftApplicationCard extends ConsumerWidget {
   }
 
   String _formatDate(DateTime date) {
-    return '${date.day}/${date.month}/${date.year} ${_formatTime(date)}';
+    // Convert to local time if it's in UTC
+    final localDate = date.isUtc ? date.toLocal() : date;
+    return '${localDate.day}/${localDate.month}/${localDate.year} ${_formatTime(localDate)}';
   }
 
   String _formatTime(DateTime date) {
-    return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}';
+    // Convert to local time if it's in UTC
+    final localDate = date.isUtc ? date.toLocal() : date;
+    return '${localDate.hour.toString().padLeft(2, '0')}:${localDate.minute.toString().padLeft(2, '0')}';
   }
 }

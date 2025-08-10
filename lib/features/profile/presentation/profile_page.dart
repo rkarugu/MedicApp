@@ -25,15 +25,16 @@ class ProfilePage extends ConsumerWidget {
               backgroundImage: NetworkImage('https://via.placeholder.com/150'), // Placeholder image
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Ayden Lee',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            Text(
+              ref.watch(authNotifierProvider).user?.name ?? 'User Name',
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            const Text(
-              'ayden@uptownnvintage.com',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+            Text(
+              ref.watch(authNotifierProvider).user?.email ?? 'user@example.com',
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 30),
+            _ProfileMenu(title: 'History', icon: Icons.history, onPress: () => GoRouter.of(context).push('/history')),
             _ProfileMenu(title: 'Availability', icon: Icons.calendar_today_outlined, onPress: () => GoRouter.of(context).push('/availability')),
             _ProfileMenu(title: 'Payment Details', icon: Icons.payment_outlined, onPress: () => GoRouter.of(context).push('/payments')),
             _ProfileMenu(title: 'Reviews', icon: Icons.star_outline, onPress: () {}),

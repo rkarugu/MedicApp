@@ -6,6 +6,7 @@ import '../features/common/main_shell.dart';
 import '../features/dashboard/presentation/dashboard_page.dart';
 import '../features/profile/presentation/profile_page.dart';
 import '../features/availability/presentation/availability_page.dart';
+import '../features/history/presentation/history_page.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -44,6 +45,11 @@ final router = GoRouter(
           path: '/payments',
           name: PaymentsPage.routeName,
           builder: (context, state) => const PaymentsPage(),
+        ),
+        GoRoute(
+          path: '/history',
+          name: HistoryPage.routeName,
+          builder: (context, state) => const HistoryPage(),
         ),
       ],
     ),
